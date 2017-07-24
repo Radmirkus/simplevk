@@ -26,7 +26,6 @@ class vk:
             p.close()
             p.login_data['email'] = login
             p.login_data['pass'] = password
-            print(p.login_data)
             
             if p.method == 'get':
                 r = vk_session.get(p.url, params=p.login_data)
@@ -45,6 +44,8 @@ class vk:
                     r = vk_session.post(p.url)
                 self.access_token = r.url.partition('access_token=')[2].split('&')[0]
                 self.user_id = r.url.partition('user_id=')[2]
+            if not self.user_id:
+                raise AuthorizationError('Неправильный логин или пароль')
                 
                 
                 
@@ -76,6 +77,11 @@ class vkParser(HTMLParser):
                 self.method = attrs['method']
         elif tag == 'input' and 'name' in attrs:
             self.login_data[attrs['name']] = attrs['value'] if 'value' in attrs else ""
-
+            
+            
+            
+class AuthorizationError(Exception):
+    def __init__(self, value):
+        self.value = value
 
 
